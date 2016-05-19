@@ -277,6 +277,8 @@ type GetByScoreRangeOptions struct {
 
 // Get the nodes whose score within the specific range
 //
+// If options is nil, it searchs in interval [start, end] without any limit by default
+//
 // Time complexity of this method is : O(log(N))
 func (this *SortedSet) GetByScoreRange(start SCORE, end SCORE, options *GetByScoreRangeOptions) []*SortedSetNode {
 
@@ -460,6 +462,7 @@ func (this *SortedSet) GetByRankRange(start int, end int, remove bool) []*Sorted
 // Note that the rank is 1-based integer. Rank 1 means the first node; Rank -1 means the last node;
 //
 // If remove is true, the returned nodes are removed
+// If node is not found at specific rank, nil is returned
 //
 // Time complexity of this method is : O(log(N))
 func (this *SortedSet) GetByRank(rank int, remove bool) *SortedSetNode {
