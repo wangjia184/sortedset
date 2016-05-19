@@ -228,12 +228,10 @@ func (this *SortedSet) PopMax() *SortedSetNode {
 	return x
 }
 
-// Add an element into the sorted set
-// @key : unique key of the element, if key existed, it will be updated
-// @score : a score controls the order in the set, score can be the same with other elements
-// @value : associated value
-// Return : a boolean value indicates if the element is added; false means updated
-// Time Complexity : O(log(N))
+// Add an element into the sorted set with specific key / value / score.
+// if the element is added, this method returns true; otherwise false means updated
+//
+// Time complexity of this method is : O(log(N))
 func (this *SortedSet) AddOrUpdate(key string, score SCORE, value interface{}) bool {
 	var newNode *SortedSetNode = nil
 
@@ -257,7 +255,8 @@ func (this *SortedSet) AddOrUpdate(key string, score SCORE, value interface{}) b
 }
 
 // Delete element specified by key
-// Time Complexity : O(log(N))
+//
+// Time complexity of this method is : O(log(N))
 func (this *SortedSet) Remove(key string) bool {
 	found := this.dict[key]
 	if found != nil {
@@ -273,9 +272,9 @@ type GetByScoreRangeOptions struct {
 	ExcludeEnd   bool // exclude end value, so it search in interval [start, end) or (start, end)
 }
 
-// get the nodes whose score within the range of [start, end]
-// If start is greater than end, it is searching in reverse order
-// Time Complexity : O(log(N))
+// Get the nodes whose score within the specific range
+//
+// Time complexity of this method is : O(log(N))
 func (this *SortedSet) GetByScoreRange(start SCORE, end SCORE, options *GetByScoreRangeOptions) []*SortedSetNode {
 
 	// prepare parameters
@@ -383,13 +382,13 @@ func (this *SortedSet) GetByScoreRange(start SCORE, end SCORE, options *GetBySco
 	return nodes
 }
 
-// Get nodes within rank range [start, end]
-// @param start, 1-based rank;
-// @param end, 1-based rank;
-// @param remove, whether to remove the found nodes
-// Rank 1 means the first node; Rank -1 means the last node;
+// Get nodes within specific rank range [start, end]
+// Note that the rank is 1-based integer. Rank 1 means the first node; Rank -1 means the last node;
+//
 // If start is greater than end, the returned array is in reserved order
-// Time Complexity : O(log(N))
+// If remove is true, the returned nodes are removed
+//
+// Time complexity of this method is : O(log(N))
 func (this *SortedSet) GetByRankRange(start int, end int, remove bool) []*SortedSetNode {
 
 	/* Sanitize indexes. */
@@ -454,9 +453,11 @@ func (this *SortedSet) GetByRankRange(start int, end int, remove bool) []*Sorted
 	return nodes
 }
 
-// Get node by rank
-// @param rank, 1-based rank; 1 means the first node; -1 means the last node;
-// @param remove, whether to remove the found node
+// Get node by rank.
+// Note that the rank is 1-based integer. Rank 1 means the first node; Rank -1 means the last node;
+//
+// If remove is true, the returned nodes are removed
+//
 // Time Complexity : O(log(N))
 func (this *SortedSet) GetByRank(rank int, remove bool) *SortedSetNode {
 	nodes := this.GetByRankRange(rank, rank, remove)
@@ -467,8 +468,10 @@ func (this *SortedSet) GetByRank(rank int, remove bool) *SortedSetNode {
 }
 
 // Find the rank of the node specified by key
-// @param key, the key of the node
+// Note that the rank is 1-based integer. Rank 1 means the first node
+//
 // If the node is not found, 0 is returned. Otherwise rank(> 0) is returned
+//
 // Time Complexity : O(log(N))
 func (this *SortedSet) FindRank(key string) int {
 	var rank int = 0
