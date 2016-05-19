@@ -197,13 +197,15 @@ func (this *SortedSet) GetCount() int64 {
 }
 
 // get the element with minimum score, nil if the set is empty
-// Time Complexity : O(1)
+//
+// Time complexity of this method is : O(log(N))
 func (this *SortedSet) PeekMin() *SortedSetNode {
 	return this.header.level[0].forward
 }
 
 // get and remove the element with minimal score, nil if the set is empty
-// Time Complexity : O(log(N))
+//
+// // Time complexity of this method is : O(log(N))
 func (this *SortedSet) PopMin() *SortedSetNode {
 	x := this.header.level[0].forward
 	if x != nil {
@@ -219,7 +221,8 @@ func (this *SortedSet) PeekMax() *SortedSetNode {
 }
 
 // get and remove the element with maximum score, nil if the set is empty
-// Time Complexity : O(log(N))
+//
+// Time complexity of this method is : O(log(N))
 func (this *SortedSet) PopMax() *SortedSetNode {
 	x := this.tail
 	if x != nil {
@@ -458,7 +461,7 @@ func (this *SortedSet) GetByRankRange(start int, end int, remove bool) []*Sorted
 //
 // If remove is true, the returned nodes are removed
 //
-// Time Complexity : O(log(N))
+// Time complexity of this method is : O(log(N))
 func (this *SortedSet) GetByRank(rank int, remove bool) *SortedSetNode {
 	nodes := this.GetByRankRange(rank, rank, remove)
 	if len(nodes) == 1 {
@@ -472,7 +475,7 @@ func (this *SortedSet) GetByRank(rank int, remove bool) *SortedSetNode {
 //
 // If the node is not found, 0 is returned. Otherwise rank(> 0) is returned
 //
-// Time Complexity : O(log(N))
+// Time complexity of this method is : O(log(N))
 func (this *SortedSet) FindRank(key string) int {
 	var rank int = 0
 	node := this.dict[key]

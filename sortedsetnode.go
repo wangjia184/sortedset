@@ -38,9 +38,12 @@ type SortedSetNode struct {
 	level    []SortedSetLevel
 }
 
+// Get the key of the node
 func (this *SortedSetNode) Key() string {
 	return this.key
 }
+
+// Get the node of the node
 func (this *SortedSetNode) Score() SCORE {
 	return this.score
 }
