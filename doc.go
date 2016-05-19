@@ -23,7 +23,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /*
-Package sortedset provides an ordered collection implemented basing on skiplist for fast access
+Package sortedset provides an ordered collection implemented basing on skiplist for fast access O(log(N))
 
 Introduction
 
@@ -47,68 +47,68 @@ A typical use case of sorted set is a leader board in a massive online game, whe
 Examples
 
     // create a new set
-    sortedset := New()
+    set := sortedset.New()
 
     // fill in new node
-    sortedset.AddOrUpdate("a", 89, "Kelly")
-    sortedset.AddOrUpdate("b", 100, "Staley")
-    sortedset.AddOrUpdate("c", 100, "Jordon")
-    sortedset.AddOrUpdate("d", -321, "Park")
-    sortedset.AddOrUpdate("e", 101, "Albert")
-    sortedset.AddOrUpdate("f", 99, "Lyman")
-    sortedset.AddOrUpdate("g", 99, "Singleton")
-    sortedset.AddOrUpdate("h", 70, "Audrey")
+    set.AddOrUpdate("a", 89, "Kelly")
+    set.AddOrUpdate("b", 100, "Staley")
+    set.AddOrUpdate("c", 100, "Jordon")
+    set.AddOrUpdate("d", -321, "Park")
+    set.AddOrUpdate("e", 101, "Albert")
+    set.AddOrUpdate("f", 99, "Lyman")
+    set.AddOrUpdate("g", 99, "Singleton")
+    set.AddOrUpdate("h", 70, "Audrey")
 
     // update an existing node by key
-    sortedset.AddOrUpdate("e", 99, "ntrnrt")
+    set.AddOrUpdate("e", 99, "ntrnrt")
 
     // remove node by key
-    sortedset.Remove("b")
+    set.Remove("b")
 
     // get and remove the node with minimum score
-    sortedset.PopMin()
+    set.PopMin()
 
     // get the node with maximum score
-    sortedset.PeekMax()
+    set.PeekMax()
 
     // get the node at rank 1 (the node with minimum score)
-    sortedset.GetByRank(1, false)
+    set.GetByRank(1, false)
 
     // get & remove the node at rank -1 (the node with maximum score)
-    sortedset.GetByRank(-1, true)
+    set.GetByRank(-1, true)
 
     // get the node with the 2nd highest maximum score
-    sortedset.GetByRank(-2, false)
+    set.GetByRank(-2, false)
 
     // get nodes with in rank range [1, -1],  that is all nodes actually
-    sortedset.GetByRankRange(1, -1, false)
+    set.GetByRankRange(1, -1, false)
 
     // get & remove the 2nd/3rd nodes in reserve order
-    sortedset.GetByRankRange(-2, -3, true)
+    set.GetByRankRange(-2, -3, true)
 
     // get the nodes whose score are within the interval [60,100]
-    sortedset.GetByScoreRange(60, 100, nil)
+    set.GetByScoreRange(60, 100, nil)
 
     // get the nodes whose score are within the interval (60,100]
-    sortedset.GetByScoreRange(60, 100, &GetByScoreRangeOptions{
+    set.GetByScoreRange(60, 100, &GetByScoreRangeOptions{
         ExcludeStart: true,
     })
 
     // get the nodes whose score are within the interval [60,100)
-    sortedset.GetByScoreRange(60, 100, &GetByScoreRangeOptions{
+    set.GetByScoreRange(60, 100, &GetByScoreRangeOptions{
         ExcludeEnd: true,
     })
 
     // get the nodes whose score are within the interval [60,100] in reverse order
-    sortedset.GetByScoreRange(100, 60, nil)
+    set.GetByScoreRange(100, 60, nil)
 
     // get the top 2 nodes with lowest scores within the interval [60,100]
-    sortedset.GetByScoreRange(60, 100, &GetByScoreRangeOptions{
+    set.GetByScoreRange(60, 100, &GetByScoreRangeOptions{
         Limit: 2,
     })
 
     // get the top 2 nodes with highest scores within the interval [60,100]
-    sortedset.GetByScoreRange(100, 60, &GetByScoreRangeOptions{
+    set.GetByScoreRange(100, 60, &GetByScoreRangeOptions{
         Limit: 2,
     })
 
