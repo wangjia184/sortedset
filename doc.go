@@ -118,6 +118,11 @@ Examples
         Limit: 2,
     })
 
-
+    // get the top 2 nodes with highest scores within the interval (60,100)
+    set.GetByScoreRange(100, 60, &GetByScoreRangeOptions{
+        Limit: 2,
+        ExcludeStart: true,
+        ExcludeEnd: true,
+    })
 */
 package sortedset
