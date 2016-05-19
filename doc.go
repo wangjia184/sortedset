@@ -65,6 +65,12 @@ Examples
     // remove node by key
     set.Remove("b")
 
+    // get the number of nodes in this set
+    set.GetCount()
+
+    // find the rank(postion) in the set.
+    set.FindRank("d") // return 1 here
+
     // get and remove the node with minimum score
     set.PopMin()
 
