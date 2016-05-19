@@ -91,6 +91,16 @@ func TestCase2(t *testing.T) {
 	nodes = sortedset.GetByScoreRange(500, 600, nil)
 	checkOrder(t, nodes, []string{})
 
+	rank := sortedset.FindRank("f")
+	if rank != 5 {
+		t.Error("FindRank() does not return expected value `5`")
+	}
+
+	rank = sortedset.FindRank("d")
+	if rank != 1 {
+		t.Error("FindRank() does not return expected value `1`")
+	}
+
 	nodes = sortedset.GetByScoreRange(99, 100, nil)
 	checkOrder(t, nodes, []string{"e", "f", "g", "c"})
 

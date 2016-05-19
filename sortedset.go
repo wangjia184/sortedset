@@ -502,3 +502,29 @@ func (this *SortedSet) GetByRank(rank int, remove bool) *SortedSetNode {
 	}
 	return nil
 }
+
+// Find the rank of the node specified by key
+// @param key, the key of the node
+// If the node is not found, 0 is returned. Otherwise rank(> 0) is returned
+// Time Complexity : O(log(N))
+func (this *SortedSet) FindRank(key string) int {
+	var rank int = 0
+	node := this.dict[key]
+	if node != nil {
+		x := this.header
+		for i := this.level - 1; i >= 0; i-- {
+			for x.level[i].forward != nil &&
+				(x.level[i].forward.score < node.score ||
+					(x.level[i].forward.score == node.score &&
+						x.level[i].forward.key <= node.key)) {
+				rank += int(x.level[i].span)
+				x = x.level[i].forward
+			}
+
+			if x.key == key {
+				return rank
+			}
+		}
+	}
+	return 0
+}
