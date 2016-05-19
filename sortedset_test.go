@@ -63,8 +63,11 @@ func TestCase1(t *testing.T) {
 }
 
 func TestCase2(t *testing.T) {
+
+	// create a new set
 	sortedset := New()
 
+	// fill in new node
 	sortedset.AddOrUpdate("a", 89, "Kelly")
 	sortedset.AddOrUpdate("b", 100, "Staley")
 	sortedset.AddOrUpdate("c", 100, "Jordon")
@@ -74,8 +77,10 @@ func TestCase2(t *testing.T) {
 	sortedset.AddOrUpdate("g", 99, "Singleton")
 	sortedset.AddOrUpdate("h", 70, "Audrey")
 
+	// update an existing node
 	sortedset.AddOrUpdate("e", 99, "ntrnrt")
 
+	// remove node
 	sortedset.Remove("b")
 
 	nodes := sortedset.GetByScoreRange(-500, 500, nil)

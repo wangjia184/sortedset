@@ -30,29 +30,8 @@ import (
 
 type SCORE float64 // the type of score
 
-const ZSKIPLIST_MAXLEVEL = 32 /* Should be enough for 2^32 elements */
-const ZSKIPLIST_P = 0.25      /* Skiplist P = 1/4 */
-
-type SortedSetLevel struct {
-	forward *SortedSetNode
-	span    int64
-}
-
-// Node in skip list
-type SortedSetNode struct {
-	key      string      // unique key of this node
-	Value    interface{} // value associated with this node
-	score    SCORE       // score to determine the order of this node
-	backward *SortedSetNode
-	level    []SortedSetLevel
-}
-
-func (this *SortedSetNode) Key() string {
-	return this.key
-}
-func (this *SortedSetNode) Score() SCORE {
-	return this.score
-}
+const SKIPLIST_MAXLEVEL = 32 /* Should be enough for 2^32 elements */
+const SKIPLIST_P = 0.25      /* Skiplist P = 1/4 */
 
 type SortedSet struct {
 	header *SortedSetNode
@@ -60,19 +39,6 @@ type SortedSet struct {
 	length int64
 	level  int
 	dict   map[string]*SortedSetNode
-}
-
-type ScoreRange struct {
-	min        SCORE
-	max        SCORE
-	excludeMin bool
-	excludeMax bool
-}
-
-type Item struct {
-	key   string
-	value interface{}
-	score SCORE
 }
 
 func createNode(level int, score SCORE, key string, value interface{}) *SortedSetNode {
@@ -86,24 +52,24 @@ func createNode(level int, score SCORE, key string, value interface{}) *SortedSe
 }
 
 // Returns a random level for the new skiplist node we are going to create.
-// The return value of this function is between 1 and ZSKIPLIST_MAXLEVEL
+// The return value of this function is between 1 and SKIPLIST_MAXLEVEL
 // (both inclusive), with a powerlaw-alike distribution where higher
 // levels are less likely to be returned.
 func randomLevel() int {
 	level := 1
-	for SCORE(rand.Int31()&0xFFFF) < (ZSKIPLIST_P * SCORE(0xFFFF)) {
+	for SCORE(rand.Int31()&0xFFFF) < (SKIPLIST_P * SCORE(0xFFFF)) {
 		level += 1
 	}
-	if level < ZSKIPLIST_MAXLEVEL {
+	if level < SKIPLIST_MAXLEVEL {
 		return level
 	}
 
-	return ZSKIPLIST_MAXLEVEL
+	return SKIPLIST_MAXLEVEL
 }
 
 func (this *SortedSet) insertNode(score SCORE, key string, value interface{}) *SortedSetNode {
-	var update [ZSKIPLIST_MAXLEVEL]*SortedSetNode
-	var rank [ZSKIPLIST_MAXLEVEL]int64
+	var update [SKIPLIST_MAXLEVEL]*SortedSetNode
+	var rank [SKIPLIST_MAXLEVEL]int64
 
 	x := this.header
 	for i := this.level - 1; i >= 0; i-- {
@@ -169,7 +135,7 @@ func (this *SortedSet) insertNode(score SCORE, key string, value interface{}) *S
 }
 
 /* Internal function used by delete, DeleteByScore and DeleteByRank */
-func (this *SortedSet) deleteNode(x *SortedSetNode, update [ZSKIPLIST_MAXLEVEL]*SortedSetNode) {
+func (this *SortedSet) deleteNode(x *SortedSetNode, update [SKIPLIST_MAXLEVEL]*SortedSetNode) {
 	for i := 0; i < this.level; i++ {
 		if update[i].level[i].forward == x {
 			update[i].level[i].span += x.level[i].span - 1
@@ -192,7 +158,7 @@ func (this *SortedSet) deleteNode(x *SortedSetNode, update [ZSKIPLIST_MAXLEVEL]*
 
 /* Delete an element with matching score/key from the skiplist. */
 func (this *SortedSet) delete(score SCORE, key string) bool {
-	var update [ZSKIPLIST_MAXLEVEL]*SortedSetNode
+	var update [SKIPLIST_MAXLEVEL]*SortedSetNode
 
 	x := this.header
 	for i := this.level - 1; i >= 0; i-- {
@@ -221,7 +187,7 @@ func New() *SortedSet {
 		level: 1,
 		dict:  make(map[string]*SortedSetNode),
 	}
-	sortedSet.header = createNode(ZSKIPLIST_MAXLEVEL, 0, "", nil)
+	sortedSet.header = createNode(SKIPLIST_MAXLEVEL, 0, "", nil)
 	return &sortedSet
 }
 
@@ -445,7 +411,7 @@ func (this *SortedSet) GetByRankRange(start int, end int, remove bool) []*Sorted
 		start, end = end, start
 	}
 
-	var update [ZSKIPLIST_MAXLEVEL]*SortedSetNode
+	var update [SKIPLIST_MAXLEVEL]*SortedSetNode
 	var nodes []*SortedSetNode
 	var traversed int = 0
 
