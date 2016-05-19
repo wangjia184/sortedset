@@ -43,7 +43,8 @@ Use Case
 
 A typical use case of sorted set is a leader board in a massive online game, where every time a new score is submitted you update it using AddOrUpdate() method. You can easily take the top users using GetByRankRange() method, you can also, given an user id, return its rank in the listing using FindRank() method. Using FindRank() and GetByRankRange() together you can show users with a score similar to a given user. All very quickly.
 
-Usage
+
+Examples
 
     // create a new set
     sortedset := New()
@@ -58,13 +59,59 @@ Usage
     sortedset.AddOrUpdate("g", 99, "Singleton")
     sortedset.AddOrUpdate("h", 70, "Audrey")
 
-    // update an existing node
+    // update an existing node by key
     sortedset.AddOrUpdate("e", 99, "ntrnrt")
 
-    // remove node
+    // remove node by key
     sortedset.Remove("b")
 
-The __rank__ is 1-based, that is to say, rank 1 is the node with minimum score.
+    // get and remove the node with minimum score
+    sortedset.PopMin()
+
+    // get the node with maximum score
+    sortedset.PeekMax()
+
+    // get the node at rank 1 (the node with minimum score)
+    sortedset.GetByRank(1, false)
+
+    // get & remove the node at rank -1 (the node with maximum score)
+    sortedset.GetByRank(-1, true)
+
+    // get the node with the 2nd highest maximum score
+    sortedset.GetByRank(-2, false)
+
+    // get nodes with in rank range [1, -1],  that is all nodes actually
+    sortedset.GetByRankRange(1, -1, false)
+
+    // get & remove the 2nd/3rd nodes in reserve order
+    sortedset.GetByRankRange(-2, -3, true)
+
+    // get the nodes whose score are within the interval [60,100]
+    sortedset.GetByScoreRange(60, 100, nil)
+
+    // get the nodes whose score are within the interval (60,100]
+    sortedset.GetByScoreRange(60, 100, &GetByScoreRangeOptions{
+        ExcludeStart: true,
+    })
+
+    // get the nodes whose score are within the interval [60,100)
+    sortedset.GetByScoreRange(60, 100, &GetByScoreRangeOptions{
+        ExcludeEnd: true,
+    })
+
+    // get the nodes whose score are within the interval [60,100] in reverse order
+    sortedset.GetByScoreRange(100, 60, nil)
+
+    // get the top 2 nodes with lowest scores within the interval [60,100]
+    sortedset.GetByScoreRange(60, 100, &GetByScoreRangeOptions{
+        Limit: 2,
+    })
+
+    // get the top 2 nodes with highest scores within the interval [60,100]
+    sortedset.GetByScoreRange(100, 60, &GetByScoreRangeOptions{
+        Limit: 2,
+    })
+
 
 */
 package sortedset
