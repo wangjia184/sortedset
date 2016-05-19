@@ -39,10 +39,30 @@ Each node in the set is associated with a key. While keys are unique, scores may
 
 Sorted Set is implemented basing on skip list and hash map internally. With sorted sets you can add, remove, or update nodes in a very fast way (in a time proportional to the logarithm of the number of nodes). You can also get ranges by score or by rank (position) in a very fast way. Accessing the middle of a sorted set is also very fast, so you can use Sorted Sets as a smart list of non repeating nodes where you can quickly access everything you need: nodes in order, fast existence test, fast access to nodes in the middle!
 
-A typical use case of sorted set is a leader board in a massive online game, where every time a new score is submitted you update it using `AddOrUpdate()`. You can easily take the top users using `GetByRankRange()`, you can also, given an user id, return its rank in the listing using `FindRank()`. Using `FindRank()` and `GetByRankRange()` together you can show users with a score similar to a given user. All very quickly.
+Use Case
+
+A typical use case of sorted set is a leader board in a massive online game, where every time a new score is submitted you update it using AddOrUpdate() method. You can easily take the top users using GetByRankRange() method, you can also, given an user id, return its rank in the listing using FindRank() method. Using FindRank() and GetByRankRange() together you can show users with a score similar to a given user. All very quickly.
 
 Usage
 
+    // create a new set
+    sortedset := New()
+
+    // fill in new node
+    sortedset.AddOrUpdate("a", 89, "Kelly")
+    sortedset.AddOrUpdate("b", 100, "Staley")
+    sortedset.AddOrUpdate("c", 100, "Jordon")
+    sortedset.AddOrUpdate("d", -321, "Park")
+    sortedset.AddOrUpdate("e", 101, "Albert")
+    sortedset.AddOrUpdate("f", 99, "Lyman")
+    sortedset.AddOrUpdate("g", 99, "Singleton")
+    sortedset.AddOrUpdate("h", 70, "Audrey")
+
+    // update an existing node
+    sortedset.AddOrUpdate("e", 99, "ntrnrt")
+
+    // remove node
+    sortedset.Remove("b")
 
 The __rank__ is 1-based, that is to say, rank 1 is the node with minimum score.
 
