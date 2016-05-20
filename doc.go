@@ -62,6 +62,9 @@ Examples
     // update an existing node by key
     set.AddOrUpdate("e", 99, "ntrnrt")
 
+    // get the node by key
+    set.GetByKey("b")
+
     // remove node by key
     set.Remove("b")
 
