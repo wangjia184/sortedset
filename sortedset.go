@@ -475,7 +475,7 @@ func (this *SortedSet) GetByRank(rank int, remove bool) *SortedSetNode {
 
 // Get node by key
 //
-// If node is not found at specific rank, nil is returned
+// If node is not found, nil is returned
 // Time complexity : O(1)
 func (this *SortedSet) GetByKey(key string) *SortedSetNode {
 	return this.dict[key]
