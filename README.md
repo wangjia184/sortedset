@@ -6,7 +6,7 @@ Sorted Set is an ordered collection of nodes. Every node is associated with thes
 |---|---|---|
 | `key` | `string` | The identifier of the node. It must be unique within the set. |
 | `value` | `interface {}` | value associated with this node |
-| `score` | `float64` | score is in order to take the sorted set ordered. It may be repeated. |
+| `score` | `int64` | score is in order to take the sorted set ordered. It may be repeated. |
 
 Each node in the set is associated with a `key`. While `key`s are unique, `score`s may be repeated. 
 Nodes are __taken in order instead of ordered afterwards__, from low score to high score. If scores are the same, the node is ordered by its key in lexicographic order. Each node in the set is associated with __rank__, which represents the position of the node in the sorted set. The __rank__ is 1-based, that is to say, rank 1 is the node with minimum score.

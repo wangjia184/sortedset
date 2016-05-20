@@ -32,7 +32,7 @@ Every node in the set is associated with these properties.
     type SortedSetNode struct {
         key      string      // unique key of this node
         Value    interface{} // associated data
-        score    SCORE       // score to determine the order of this node in the set
+        score    SCORE       // int64 score to determine the order of this node in the set
     }
 
 Each node in the set is associated with a key. While keys are unique, scores may be repeated. Nodes are taken in order (from low score to high score) instead of ordered afterwards. If scores are the same, the node is ordered by its key in lexicographic order. Each node in the set also can be accessed by rank, which represents the position in the sorted set.

@@ -28,7 +28,7 @@ import (
 	"math/rand"
 )
 
-type SCORE float64 // the type of score
+type SCORE int64 // the type of score
 
 const SKIPLIST_MAXLEVEL = 32 /* Should be enough for 2^32 elements */
 const SKIPLIST_P = 0.25      /* Skiplist P = 1/4 */
@@ -57,7 +57,7 @@ func createNode(level int, score SCORE, key string, value interface{}) *SortedSe
 // levels are less likely to be returned.
 func randomLevel() int {
 	level := 1
-	for SCORE(rand.Int31()&0xFFFF) < (SKIPLIST_P * SCORE(0xFFFF)) {
+	for float64(rand.Int31()&0xFFFF) < float64(SKIPLIST_P*0xFFFF) {
 		level += 1
 	}
 	if level < SKIPLIST_MAXLEVEL {

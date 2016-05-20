@@ -1,11 +1,14 @@
 package sortedset
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"math/rand"
+	"os"
 	"runtime/debug"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 )
@@ -167,89 +170,4 @@ func TestCase2(t *testing.T) {
 
 	nodes = sortedset.GetByScoreRange(500, -500, nil)
 	checkOrder(t, nodes, []string{"g", "f", "e", "a", "h"})
-}
-
-var sets [100]*SortedSet
-
-func TestTimeComplexity(t *testing.T) {
-	debug.SetGCPercent(-1)
-	var buffer bytes.Buffer
-
-	buffer.WriteString("\nCount\t\tAdd\t\tGetByScore\tGetByRank\tRemove")
-
-	sets[0] = test(&buffer, 10000)
-	sets[1] = test(&buffer, 100000)
-	sets[2] = test(&buffer, 1000000)
-	//sets[3] = test(&buffer, 10000000)
-	//sets[4] = test(&buffer, 100000000)
-
-	t.Log(buffer.String())
-}
-
-type testData struct {
-	key   string
-	score SCORE
-	value string
-}
-
-func test(buffer *bytes.Buffer, rounds int) *SortedSet {
-
-	sortedset := New()
-
-	data := make([]testData, rounds)
-	for i := 0; i < rounds; i++ {
-		data[i] = testData{
-			score: SCORE(rand.NormFloat64()),
-			value: "d",
-			key:   strconv.Itoa(i),
-		}
-	}
-
-	buffer.WriteString(fmt.Sprintf("\n%d\t\t", rounds))
-
-	start := time.Now()
-	for _, d := range data {
-		sortedset.AddOrUpdate(d.key, d.score, d.value)
-	}
-	seconds := time.Now().Sub(start).Seconds() * 1000000 / float64(rounds)
-	buffer.WriteString(fmt.Sprintf("%.2f us/op\t", seconds))
-
-	for i := 0; i < 1000; i++ {
-		ff := sortedset.GetByScoreRange(data[i].score, data[i].score, nil)
-		if len(ff) == 0 {
-			panic("Unable to find the item")
-		}
-	}
-
-	start = time.Now()
-	for i := 0; i < 1000; i++ {
-		ff := sortedset.GetByScoreRange(data[i].score, data[i].score, nil)
-		if len(ff) == 0 {
-			panic("Unable to find the item")
-		}
-	}
-	seconds = time.Now().Sub(start).Seconds() * 1000
-	buffer.WriteString(fmt.Sprintf("%.2f us/op\t", seconds))
-
-	var foundItems [1000]*SortedSetNode
-
-	start = time.Now()
-	for i := 0; i < cap(foundItems); i++ {
-		rank := rounds/2 + i
-		node := sortedset.GetByRank(rank, false)
-		if node == nil {
-			panic("Unable to find the item")
-		}
-		foundItems[i] = node
-	}
-	seconds = time.Now().Sub(start).Seconds() * 1000
-	buffer.WriteString(fmt.Sprintf("%.2f us/op\t", seconds))
-
-	start = time.Now()
-	for _, item := range foundItems {
-		sortedset.Remove(item.Key())
-	}
-	seconds = time.Now().Sub(start).Seconds() * 1000
-	buffer.WriteString(fmt.Sprintf("%.2f us/op\t\t", seconds))
-	return sortedset
 }
