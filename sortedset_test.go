@@ -1,16 +1,7 @@
 package sortedset
 
 import (
-	"bufio"
-	"bytes"
-	"fmt"
-	"math/rand"
-	"os"
-	"runtime/debug"
-	"strconv"
-	"strings"
 	"testing"
-	"time"
 )
 
 func checkOrder(t *testing.T, nodes []*SortedSetNode, expectedOrder []string) {

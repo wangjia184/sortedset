@@ -260,13 +260,13 @@ func (this *SortedSet) AddOrUpdate(key string, score SCORE, value interface{}) b
 // Delete element specified by key
 //
 // Time complexity of this method is : O(log(N))
-func (this *SortedSet) Remove(key string) bool {
+func (this *SortedSet) Remove(key string) *SortedSetNode {
 	found := this.dict[key]
 	if found != nil {
 		this.delete(found.score, found.key)
-		return true
+		return found
 	}
-	return false
+	return nil
 }
 
 type GetByScoreRangeOptions struct {
@@ -471,6 +471,14 @@ func (this *SortedSet) GetByRank(rank int, remove bool) *SortedSetNode {
 		return nodes[0]
 	}
 	return nil
+}
+
+// Get node by key
+//
+// If node is not found at specific rank, nil is returned
+// Time complexity : O(1)
+func (this *SortedSet) GetByKey(key string) *SortedSetNode {
+	return this.dict[key]
 }
 
 // Find the rank of the node specified by key
