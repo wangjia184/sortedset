@@ -192,8 +192,8 @@ func New() *SortedSet {
 }
 
 // Get the number of elements
-func (this *SortedSet) GetCount() int64 {
-	return this.length
+func (this *SortedSet) GetCount() int {
+	return int(this.length)
 }
 
 // get the element with minimum score, nil if the set is empty
