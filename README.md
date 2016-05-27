@@ -1,6 +1,6 @@
-# Sorted Set in Go
+# Sorted Set in Golang
 
-Sorted Set is an ordered collection of nodes. Every node is associated with these properties.
+Sorted Set is a data-struct inspired by the one from Redis. It allows fast access by key or score.
 
 | Property | Type | Description |
 |---|---|---|
@@ -15,5 +15,6 @@ Sorted Set is implemented basing on skip list and hash map internally. With sort
 
 A typical use case of sorted set is a leader board in a massive online game, where every time a new score is submitted you update it using `AddOrUpdate()`. You can easily take the top users using `GetByRankRange()`, you can also, given an user id, return its rank in the listing using `FindRank()`. Using `FindRank()` and `GetByRankRange()` together you can show users with a score similar to a given user. All very quickly.
 
+## Documentation
 
-Please check GoDoc [here](https://godoc.org/github.com/wangjia184/sortedset)
+[https://godoc.org/github.com/wangjia184/sortedset](https://godoc.org/github.com/wangjia184/sortedset)

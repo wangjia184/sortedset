@@ -23,7 +23,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /*
-Package sortedset provides an ordered collection implemented basing on skiplist for fast access O(log(N))
+Package sortedset provides the data-struct allows fast access the element in set by key or by score(order). It is inspired by Sorted Set from Redis.
 
 Introduction
 
