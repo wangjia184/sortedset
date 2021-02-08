@@ -1,7 +1,10 @@
 package sortedset
 
 import (
+	"fmt"
+	"math/rand"
 	"testing"
+	"time"
 )
 
 func checkOrder(t *testing.T, nodes []*SortedSetNode, expectedOrder []string) {
@@ -161,4 +164,36 @@ func TestCase2(t *testing.T) {
 
 	nodes = sortedset.GetByScoreRange(500, -500, nil)
 	checkOrder(t, nodes, []string{"g", "f", "e", "a", "h"})
+}
+func TestCase3(t *testing.T) {
+	sortedset := New()
+	testSet := make(map[string]int64)
+	rand.Seed(0)
+	for len(testSet) < 1000000 {
+		k := rand.Int63()
+		ks := fmt.Sprintf("%d", k)
+		if _, ok := testSet[ks]; !ok {
+			testSet[ks] = k
+		}
+	}
+
+	startts := time.Now()
+
+	for k, v := range testSet {
+		sortedset.AddOrUpdate(k, SCORE(v), v)
+	}
+
+	dur := time.Since(startts)
+	t.Logf("insert cost %v ", dur)
+
+	startts = time.Now()
+	for {
+		min := sortedset.PopMin()
+		if min == nil {
+			break
+		}
+	}
+	dur = time.Since(startts)
+	t.Logf("pop cost %v ", dur)
+
 }
