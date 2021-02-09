@@ -23,16 +23,23 @@ func TestCase1(t *testing.T) {
 	sortedset := New()
 
 	sortedset.AddOrUpdate("a", 89, "Kelly")
+	sortedset.Print()
 	sortedset.AddOrUpdate("b", 100, "Staley")
+	sortedset.Print()
 	sortedset.AddOrUpdate("c", 100, "Jordon")
+	sortedset.Print()
 	sortedset.AddOrUpdate("d", -321, "Park")
+	sortedset.Print()
 	sortedset.AddOrUpdate("e", 101, "Albert")
+	sortedset.Print()
 	sortedset.AddOrUpdate("f", 99, "Lyman")
+	sortedset.Print()
 	sortedset.AddOrUpdate("g", 99, "Singleton")
+	sortedset.Print()
 	sortedset.AddOrUpdate("h", 70, "Audrey")
-
+	sortedset.Print()
 	sortedset.AddOrUpdate("e", 99, "ntrnrt")
-
+	sortedset.Print()
 	sortedset.Remove("b")
 
 	node := sortedset.GetByRank(3, false)
@@ -169,7 +176,8 @@ func TestCase3(t *testing.T) {
 	sortedset := New()
 	testSet := make(map[string]int64)
 	rand.Seed(0)
-	for len(testSet) < 1000000 {
+	count := 100000
+	for len(testSet) < count {
 		k := rand.Int63()
 		ks := fmt.Sprintf("%d", k)
 		if _, ok := testSet[ks]; !ok {
@@ -184,7 +192,7 @@ func TestCase3(t *testing.T) {
 	}
 
 	dur := time.Since(startts)
-	t.Logf("insert cost %v ", dur)
+	t.Logf("insert cost %v ", dur/time.Duration(count))
 
 	startts = time.Now()
 	for {
@@ -194,6 +202,6 @@ func TestCase3(t *testing.T) {
 		}
 	}
 	dur = time.Since(startts)
-	t.Logf("pop cost %v ", dur)
+	t.Logf("pop cost %v ", dur/time.Duration(count))
 
 }
