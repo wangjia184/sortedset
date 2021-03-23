@@ -508,3 +508,22 @@ func (this *SortedSet) FindRank(key string) int {
 	}
 	return 0
 }
+
+// IterFunc apply fn to node until fn return false or end of list
+//
+// Time complexity of this method is : O(log(N))
+func (this *SortedSet) IterFunc(fn func(i int, key string, value interface{}) bool) {
+	end := int(this.length)
+	var traversed int
+	x := this.header.level[0].forward
+	for x != nil && traversed < end {
+		next := x.level[0].forward
+
+		if !fn(traversed, x.key, x.Value) {
+			return
+		}
+
+		traversed++
+		x = next
+	}
+}
