@@ -16,6 +16,28 @@ func checkOrder(t *testing.T, nodes []*SortedSetNode, expectedOrder []string) {
 	}
 }
 
+func checkIterByRankRange(t *testing.T, sortedset *SortedSet, start int, end int, expectedOrder []string) {
+	var keys []string
+	sortedset.IterFuncByRankRange(start, end, func(key string, _ interface{}) bool {
+		keys = append(keys, key)
+		return true
+	})
+	if len(expectedOrder) != len(keys) {
+		t.Errorf("keys does not contain %d elements", len(expectedOrder))
+	}
+	for i := 0; i < len(expectedOrder); i++ {
+		if keys[i] != expectedOrder[i] {
+			t.Errorf("keys[%d] is %q, but the expected key is %q", i, keys[i], expectedOrder[i])
+		}
+	}
+}
+
+func checkRankRangeIterAndOrder(t *testing.T, sortedset *SortedSet, start int, end int, remove bool, expectedOrder []string) {
+	checkIterByRankRange(t, sortedset, start, end, expectedOrder)
+	nodes := sortedset.GetByRankRange(start, end, remove)
+	checkOrder(t, nodes, expectedOrder)
+}
+
 func TestCase1(t *testing.T) {
 	sortedset := New()
 
@@ -43,16 +65,13 @@ func TestCase1(t *testing.T) {
 	}
 
 	// get all nodes since the first one to last one
-	nodes := sortedset.GetByRankRange(1, -1, false)
-	checkOrder(t, nodes, []string{"d", "h", "a", "e", "f", "g", "c"})
+	checkRankRangeIterAndOrder(t, sortedset, 1, -1, false, []string{"d", "h", "a", "e", "f", "g", "c"})
 
 	// get & remove the 2nd/3rd nodes in reserve order
-	nodes = sortedset.GetByRankRange(-2, -3, true)
-	checkOrder(t, nodes, []string{"g", "f"})
+	checkRankRangeIterAndOrder(t, sortedset, -2, -3, true, []string{"g", "f"})
 
 	// get all nodes since the last one to first one
-	nodes = sortedset.GetByRankRange(-1, 1, false)
-	checkOrder(t, nodes, []string{"c", "e", "a", "h", "d"})
+	checkRankRangeIterAndOrder(t, sortedset, -1, 1, false, []string{"c", "e", "a", "h", "d"})
 
 }
 
