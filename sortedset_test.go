@@ -34,6 +34,29 @@ func checkIterByRankRange(t *testing.T, sortedset *SortedSet, start int, end int
 			t.Errorf("keys[%d] is %q, but the expected key is %q", i, keys[i], expectedOrder[i])
 		}
 	}
+
+	// check return early
+	if len(expectedOrder) < 1 {
+		return
+	}
+	// reset data
+	keys = []string{}
+	var i int
+	sortedset.IterFuncByRankRange(start, end, func(key string, _ interface{}) bool {
+		keys = append(keys, key)
+		i++
+		// return early
+		return i < len(expectedOrder)-1
+	})
+	if len(expectedOrder)-1 != len(keys) {
+		t.Errorf("keys does not contain %d elements", len(expectedOrder)-1)
+	}
+	for i := 0; i < len(expectedOrder)-1; i++ {
+		if keys[i] != expectedOrder[i] {
+			t.Errorf("keys[%d] is %q, but the expected key is %q", i, keys[i], expectedOrder[i])
+		}
+	}
+
 }
 
 func checkRankRangeIterAndOrder(t *testing.T, sortedset *SortedSet, start int, end int, remove bool, expectedOrder []string) {
