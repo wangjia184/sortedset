@@ -18,6 +18,10 @@ func checkOrder(t *testing.T, nodes []*SortedSetNode, expectedOrder []string) {
 
 func checkIterByRankRange(t *testing.T, sortedset *SortedSet, start int, end int, expectedOrder []string) {
 	var keys []string
+
+	// check nil callback should do nothing
+	sortedset.IterFuncByRankRange(start, end, nil)
+
 	sortedset.IterFuncByRankRange(start, end, func(key string, _ interface{}) bool {
 		keys = append(keys, key)
 		return true
