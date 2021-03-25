@@ -387,16 +387,8 @@ func (this *SortedSet) GetByScoreRange(start SCORE, end SCORE, options *GetBySco
 	return nodes
 }
 
-// Get nodes within specific rank range [start, end]
-// Note that the rank is 1-based integer. Rank 1 means the first node; Rank -1 means the last node;
-//
-// If start is greater than end, the returned array is in reserved order
-// If remove is true, the returned nodes are removed
-//
-// Time complexity of this method is : O(log(N))
-func (this *SortedSet) GetByRankRange(start int, end int, remove bool) []*SortedSetNode {
-
-	/* Sanitize indexes. */
+// sanitizeIndexes return start, end, and reverse flag
+func (this *SortedSet) sanitizeIndexes(start int, end int) (int, int, bool) {
 	if start < 0 {
 		start = int(this.length) + start + 1
 	}
@@ -414,12 +406,11 @@ func (this *SortedSet) GetByRankRange(start int, end int, remove bool) []*Sorted
 	if reverse { // swap start and end
 		start, end = end, start
 	}
+	return start, end, reverse
+}
 
-	var update [SKIPLIST_MAXLEVEL]*SortedSetNode
-	var nodes []*SortedSetNode
-	var traversed int = 0
-
-	x := this.header
+func (this *SortedSet) findNodeByRank(start int, remove bool) (traversed int, x *SortedSetNode, update [SKIPLIST_MAXLEVEL]*SortedSetNode) {
+	x = this.header
 	for i := this.level - 1; i >= 0; i-- {
 		for x.level[i].forward != nil &&
 			traversed+int(x.level[i].span) < start {
@@ -434,6 +425,22 @@ func (this *SortedSet) GetByRankRange(start int, end int, remove bool) []*Sorted
 			}
 		}
 	}
+	return
+}
+
+// Get nodes within specific rank range [start, end]
+// Note that the rank is 1-based integer. Rank 1 means the first node; Rank -1 means the last node;
+//
+// If start is greater than end, the returned array is in reserved order
+// If remove is true, the returned nodes are removed
+//
+// Time complexity of this method is : O(log(N))
+func (this *SortedSet) GetByRankRange(start int, end int, remove bool) []*SortedSetNode {
+	start, end, reverse := this.sanitizeIndexes(start, end)
+
+	var nodes []*SortedSetNode
+
+	traversed, x, update := this.findNodeByRank(start, remove)
 
 	traversed++
 	x = x.level[0].forward
@@ -507,4 +514,42 @@ func (this *SortedSet) FindRank(key string) int {
 		}
 	}
 	return 0
+}
+
+// IterFuncByRankRange apply fn to node within specific rank range [start, end]
+// or until fn return false
+//
+// Note that the rank is 1-based integer. Rank 1 means the first node; Rank -1 means the last node;
+// If start is greater than end, apply fn in reserved order
+// If fn is nil, this function return without doing anything
+func (this *SortedSet) IterFuncByRankRange(start int, end int, fn func(key string, value interface{}) bool) {
+	if fn == nil {
+		return
+	}
+
+	start, end, reverse := this.sanitizeIndexes(start, end)
+	traversed, x, _ := this.findNodeByRank(start, false)
+	var nodes []*SortedSetNode
+
+	x = x.level[0].forward
+	for x != nil && traversed < end {
+		next := x.level[0].forward
+
+		if reverse {
+			nodes = append(nodes, x)
+		} else if !fn(x.key, x.Value) {
+			return
+		}
+
+		traversed++
+		x = next
+	}
+
+	if reverse {
+		for i := len(nodes) - 1; i >= 0; i-- {
+			if !fn(nodes[i].key, nodes[i].Value) {
+				return
+			}
+		}
+	}
 }
