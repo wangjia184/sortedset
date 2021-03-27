@@ -41,6 +41,11 @@ type SortedSet struct {
 	dict   map[string]*SortedSetNode
 }
 
+func (this *SortedSet) Print() {
+	if this.header != nil {
+		this.header.Print()
+	}
+}
 func createNode(level int, score SCORE, key string, value interface{}) *SortedSetNode {
 	node := SortedSetNode{
 		score: score,
@@ -96,6 +101,7 @@ func (this *SortedSet) insertNode(score SCORE, key string, value interface{}) *S
 	 * if the element is already inside or not. */
 	level := randomLevel()
 
+	//level := this.level + 1
 	if level > this.level { // add a new level
 		for i := this.level; i < level; i++ {
 			rank[i] = 0

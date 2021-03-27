@@ -24,6 +24,8 @@
 
 package sortedset
 
+import "fmt"
+
 type SortedSetLevel struct {
 	forward *SortedSetNode
 	span    int64
@@ -46,4 +48,18 @@ func (this *SortedSetNode) Key() string {
 // Get the node of the node
 func (this *SortedSetNode) Score() SCORE {
 	return this.score
+}
+func (this *SortedSetNode) Print() {
+	for i, _ := range this.level {
+		x := this.level[i].forward
+		if x == nil {
+			continue
+		}
+		fmt.Printf("No %d", i)
+		for x != nil {
+			fmt.Printf(" %d:%p:[%d]->", x.score, x, x.level[i].span)
+			x = x.level[i].forward
+		}
+		fmt.Printf("nil\n")
+	}
 }
