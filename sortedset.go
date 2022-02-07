@@ -273,6 +273,7 @@ type GetByScoreRangeOptions struct {
 	Limit        int  // limit the max nodes to return
 	ExcludeStart bool // exclude start value, so it search in interval (start, end] or (start, end)
 	ExcludeEnd   bool // exclude end value, so it search in interval [start, end) or (start, end)
+	Remove       bool
 }
 
 // Get the nodes whose score within the specific range
@@ -290,6 +291,7 @@ func (this *SortedSet) GetByScoreRange(start SCORE, end SCORE, options *GetBySco
 
 	excludeStart := options != nil && options.ExcludeStart
 	excludeEnd := options != nil && options.ExcludeEnd
+	remove := options != nil && options.Remove
 	reverse := start > end
 	if reverse {
 		start, end = end, start
@@ -340,6 +342,10 @@ func (this *SortedSet) GetByScoreRange(start SCORE, end SCORE, options *GetBySco
 			nodes = append(nodes, x)
 			limit--
 
+			if remove {
+				this.delete(x.score, x.key)
+			}
+
 			x = next
 		}
 	} else {
@@ -379,6 +385,10 @@ func (this *SortedSet) GetByScoreRange(start SCORE, end SCORE, options *GetBySco
 
 			nodes = append(nodes, x)
 			limit--
+
+			if remove {
+				this.delete(x.score, x.key)
+			}
 
 			x = next
 		}

@@ -207,4 +207,13 @@ func TestCase2(t *testing.T) {
 
 	nodes = sortedset.GetByScoreRange(500, -500, nil)
 	checkOrder(t, nodes, []string{"g", "f", "e", "a", "h"})
+
+	nodes = sortedset.GetByScoreRange(69, 89, &GetByScoreRangeOptions{
+		Remove: true,
+	})
+	checkOrder(t, nodes, []string{"h", "a"})
+
+	nodes = sortedset.GetByScoreRange(500, -500, nil)
+	checkOrder(t, nodes, []string{"g", "f", "e"})
+
 }
