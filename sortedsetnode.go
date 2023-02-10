@@ -24,26 +24,42 @@
 
 package sortedset
 
-type SortedSetLevel struct {
-	forward *SortedSetNode
+import (
+	"golang.org/x/exp/constraints"
+)
+
+// SortedSetLevel ...
+type SortedSetLevel[K Indexable, V any, ScoreType constraints.Ordered] struct {
+	forward *SortedSetNode[K, V, ScoreType]
 	span    int64
 }
 
-// Node in skip list
-type SortedSetNode struct {
-	key      string      // unique key of this node
-	Value    interface{} // associated data
-	score    SCORE       // score to determine the order of this node in the set
-	backward *SortedSetNode
-	level    []SortedSetLevel
+// SortedSetNode Node in skip list
+type SortedSetNode[K Indexable, V any, ScoreType constraints.Ordered] struct {
+	key      K         // unique key of this node
+	Value    V         // associated data
+	score    ScoreType // score to determine the order of this node in the set
+	backward *SortedSetNode[K, V, ScoreType]
+	level    []SortedSetLevel[K, V, ScoreType]
 }
 
-// Get the key of the node
-func (this *SortedSetNode) Key() string {
-	return this.key
+func NewSortedSetNode[K Indexable, V any, ScoreType constraints.Ordered](
+	level int, key K, value V, score ScoreType,
+) *SortedSetNode[K, V, ScoreType] {
+	return &SortedSetNode[K, V, ScoreType]{
+		key:   key,
+		Value: value,
+		score: score,
+		level: make([]SortedSetLevel[K, V, ScoreType], level),
+	}
 }
 
-// Get the node of the node
-func (this *SortedSetNode) Score() SCORE {
-	return this.score
+// Key Get the key of the node
+func (n *SortedSetNode[K, V, ScoreType]) Key() K {
+	return n.key
+}
+
+// Score Get the node of the node
+func (n *SortedSetNode[K, V, ScoreType]) Score() ScoreType {
+	return n.score
 }
