@@ -1,3 +1,3 @@
-module github.com/wangjia184/sortedset
+module github.com/hieuvo/sortedset
 
 go 1.17
