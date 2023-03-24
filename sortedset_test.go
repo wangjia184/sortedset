@@ -70,17 +70,17 @@ func TestCase1(t *testing.T) {
 	sortedset := New()
 
 	sortedset.AddOrUpdate(12, 89, "Kelly")
-	sortedset.AddOrUpdate(234, 100, "Staley")
+	sortedset.AddOrUpdate(22, 100, "Staley")
 	sortedset.AddOrUpdate(33, 100, "Jordon")
 	sortedset.AddOrUpdate(1000, -321, "Park")
 	sortedset.AddOrUpdate(1000111, 101, "Albert")
 	sortedset.AddOrUpdate(10001112, 99, "Lyman")
 	sortedset.AddOrUpdate(10001113, 99, "Singleton")
-	sortedset.AddOrUpdate(11111111, 70, "Audrey")
+	sortedset.AddOrUpdate(10001114, 70, "Audrey")
 
 	sortedset.AddOrUpdate(1000111, 99, "ntrnrt")
 
-	sortedset.Remove(234)
+	sortedset.Remove(22)
 
 	node := sortedset.GetByRank(3, false)
 	if node == nil || node.Key() != 12 {
@@ -93,13 +93,13 @@ func TestCase1(t *testing.T) {
 	}
 
 	// get all nodes since the first one to last one
-	checkRankRangeIterAndOrder(t, sortedset, 1, -1, false, []int32{1000, 11111111, 12, 1000111, 10001112, 10001113, 33})
+	checkRankRangeIterAndOrder(t, sortedset, 1, -1, false, []int32{1000, 10001114, 12, 1000111, 10001112, 10001113, 33})
 
 	// get & remove the 2nd/3rd nodes in reserve order
 	checkRankRangeIterAndOrder(t, sortedset, -2, -3, true, []int32{10001113, 10001112})
 
 	// get all nodes since the last one to first one
-	checkRankRangeIterAndOrder(t, sortedset, -1, 1, false, []int32{33, 1000111, 12, 11111111, 1000})
+	checkRankRangeIterAndOrder(t, sortedset, -1, 1, false, []int32{33, 1000111, 12, 10001114, 1000})
 
 }
 
@@ -110,26 +110,26 @@ func TestCase2(t *testing.T) {
 
 	// fill in new node
 	sortedset.AddOrUpdate(12, 89, "Kelly")
-	sortedset.AddOrUpdate(234, 100, "Staley")
+	sortedset.AddOrUpdate(22, 100, "Staley")
 	sortedset.AddOrUpdate(33, 100, "Jordon")
 	sortedset.AddOrUpdate(1000, -321, "Park")
 	sortedset.AddOrUpdate(1000111, 101, "Albert")
 	sortedset.AddOrUpdate(10001112, 99, "Lyman")
 	sortedset.AddOrUpdate(10001113, 99, "Singleton")
-	sortedset.AddOrUpdate(11111111, 70, "Audrey")
+	sortedset.AddOrUpdate(10001114, 70, "Audrey")
 
 	// update an existing node
 	sortedset.AddOrUpdate(1000111, 99, "ntrnrt")
 
 	// remove node
-	sortedset.Remove(234)
+	sortedset.Remove(22)
 
 	nodes := sortedset.GetByScoreRange(-500, 500, nil)
-	checkOrder(t, nodes, []int32{1000, 11111111, 12, 1000111, 10001112, 10001113, 33})
+	checkOrder(t, nodes, []int32{1000, 10001114, 12, 1000111, 10001112, 10001113, 33})
 
 	nodes = sortedset.GetByScoreRange(500, -500, nil)
 	//t.Logf("%v", nodes)
-	checkOrder(t, nodes, []int32{33, 10001113, 10001112, 1000111, 12, 11111111, 1000})
+	checkOrder(t, nodes, []int32{33, 10001113, 10001112, 1000111, 12, 10001114, 1000})
 
 	nodes = sortedset.GetByScoreRange(600, 500, nil)
 	checkOrder(t, nodes, []int32{})
@@ -151,7 +151,7 @@ func TestCase2(t *testing.T) {
 	checkOrder(t, nodes, []int32{1000111, 10001112, 10001113, 33})
 
 	nodes = sortedset.GetByScoreRange(90, 50, nil)
-	checkOrder(t, nodes, []int32{12, 11111111})
+	checkOrder(t, nodes, []int32{12, 10001114})
 
 	nodes = sortedset.GetByScoreRange(99, 100, &GetByScoreRangeOptions{
 		ExcludeStart: true,
@@ -176,7 +176,7 @@ func TestCase2(t *testing.T) {
 	nodes = sortedset.GetByScoreRange(50, 100, &GetByScoreRangeOptions{
 		Limit: 2,
 	})
-	checkOrder(t, nodes, []int32{11111111, 12})
+	checkOrder(t, nodes, []int32{10001114, 12})
 
 	nodes = sortedset.GetByScoreRange(100, 50, &GetByScoreRangeOptions{
 		Limit: 2,
@@ -194,7 +194,7 @@ func TestCase2(t *testing.T) {
 	}
 
 	nodes = sortedset.GetByScoreRange(-500, 500, nil)
-	checkOrder(t, nodes, []int32{11111111, 12, 1000111, 10001112, 10001113, 33})
+	checkOrder(t, nodes, []int32{10001114, 12, 1000111, 10001112, 10001113, 33})
 
 	maxNode := sortedset.PeekMax()
 	if maxNode == nil || maxNode.Key() != 33 {
@@ -207,5 +207,5 @@ func TestCase2(t *testing.T) {
 	}
 
 	nodes = sortedset.GetByScoreRange(500, -500, nil)
-	checkOrder(t, nodes, []int32{10001113, 10001112, 1000111, 12, 11111111})
+	checkOrder(t, nodes, []int32{10001113, 10001112, 1000111, 12, 10001114})
 }
