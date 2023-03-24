@@ -41,11 +41,10 @@ type SortedSet struct {
 	dict   map[int32]*SortedSetNode
 }
 
-func createNode(level int, score SCORE, key int32, value interface{}) *SortedSetNode {
+func createNode(level int, score SCORE, key int32) *SortedSetNode {
 	node := SortedSetNode{
 		score: score,
 		key:   key,
-		Value: value,
 		level: make([]SortedSetLevel, level),
 	}
 	return &node
@@ -67,7 +66,7 @@ func randomLevel() int {
 	return SKIPLIST_MAXLEVEL
 }
 
-func (s *SortedSet) insertNode(score SCORE, key int32, value interface{}) *SortedSetNode {
+func (s *SortedSet) insertNode(score SCORE, key int32) *SortedSetNode {
 	var update [SKIPLIST_MAXLEVEL]*SortedSetNode
 	var rank [SKIPLIST_MAXLEVEL]int32
 
@@ -105,7 +104,7 @@ func (s *SortedSet) insertNode(score SCORE, key int32, value interface{}) *Sorte
 		s.level = level
 	}
 
-	x = createNode(level, score, key, value)
+	x = createNode(level, score, key)
 	for i := 0; i < level; i++ {
 		x.level[i].forward = update[i].level[i].forward
 		update[i].level[i].forward = x
@@ -187,7 +186,7 @@ func New() *SortedSet {
 		level: 1,
 		dict:  make(map[int32]*SortedSetNode),
 	}
-	sortedSet.header = createNode(SKIPLIST_MAXLEVEL, 0, 0, nil)
+	sortedSet.header = createNode(SKIPLIST_MAXLEVEL, 0, 0)
 	return &sortedSet
 }
 
@@ -235,20 +234,20 @@ func (s *SortedSet) PopMax() *SortedSetNode {
 // if the element is added, this method returns true; otherwise false means updated
 //
 // Time complexity of this method is : O(log(N))
-func (s *SortedSet) AddOrUpdate(key int32, score SCORE, value interface{}) bool {
+func (s *SortedSet) AddOrUpdate(key int32, score SCORE) bool {
 	var newNode *SortedSetNode = nil
 
 	found := s.dict[key]
 	if found != nil {
 		// score does not change, only update value
 		if found.score == score {
-			found.Value = value
+			// found.Value = value
 		} else { // score changes, delete and re-insert
 			s.delete(found.score, found.key)
-			newNode = s.insertNode(score, key, value)
+			newNode = s.insertNode(score, key)
 		}
 	} else {
-		newNode = s.insertNode(score, key, value)
+		newNode = s.insertNode(score, key)
 	}
 
 	if newNode != nil {
@@ -522,7 +521,7 @@ func (s *SortedSet) FindRank(key int32) int {
 // Note that the rank is 1-based integer. Rank 1 means the first node; Rank -1 means the last node;
 // If start is greater than end, apply fn in reserved order
 // If fn is nil, this function return without doing anything
-func (s *SortedSet) IterFuncByRankRange(start int, end int, fn func(key int32, value interface{}) bool) {
+func (s *SortedSet) IterFuncByRankRange(start int, end int, fn func(key int32) bool) {
 	if fn == nil {
 		return
 	}
@@ -537,7 +536,7 @@ func (s *SortedSet) IterFuncByRankRange(start int, end int, fn func(key int32, v
 
 		if reverse {
 			nodes = append(nodes, x)
-		} else if !fn(x.key, x.Value) {
+		} else if !fn(x.key) {
 			return
 		}
 
@@ -547,7 +546,7 @@ func (s *SortedSet) IterFuncByRankRange(start int, end int, fn func(key int32, v
 
 	if reverse {
 		for i := len(nodes) - 1; i >= 0; i-- {
-			if !fn(nodes[i].key, nodes[i].Value) {
+			if !fn(nodes[i].key) {
 				return
 			}
 		}

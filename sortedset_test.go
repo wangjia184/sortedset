@@ -23,7 +23,7 @@ func checkIterByRankRange(t *testing.T, sortedset *SortedSet, start int, end int
 	// check nil callback should do nothing
 	sortedset.IterFuncByRankRange(start, end, nil)
 
-	sortedset.IterFuncByRankRange(start, end, func(key int32, _ interface{}) bool {
+	sortedset.IterFuncByRankRange(start, end, func(key int32) bool {
 		keys = append(keys, key)
 		return true
 	})
@@ -43,7 +43,7 @@ func checkIterByRankRange(t *testing.T, sortedset *SortedSet, start int, end int
 	// reset data
 	keys = []int32{}
 	var i int
-	sortedset.IterFuncByRankRange(start, end, func(key int32, _ interface{}) bool {
+	sortedset.IterFuncByRankRange(start, end, func(key int32) bool {
 		keys = append(keys, key)
 		i++
 		// return early
@@ -69,16 +69,16 @@ func checkRankRangeIterAndOrder(t *testing.T, sortedset *SortedSet, start int, e
 func TestCase1(t *testing.T) {
 	sortedset := New()
 
-	sortedset.AddOrUpdate(12, 89, "Kelly")
-	sortedset.AddOrUpdate(22, 100, "Staley")
-	sortedset.AddOrUpdate(33, 100, "Jordon")
-	sortedset.AddOrUpdate(1000, -321, "Park")
-	sortedset.AddOrUpdate(1000111, 101, "Albert")
-	sortedset.AddOrUpdate(10001112, 99, "Lyman")
-	sortedset.AddOrUpdate(10001113, 99, "Singleton")
-	sortedset.AddOrUpdate(10001114, 70, "Audrey")
+	sortedset.AddOrUpdate(12, 89)
+	sortedset.AddOrUpdate(22, 100)
+	sortedset.AddOrUpdate(33, 100)
+	sortedset.AddOrUpdate(1000, -321)
+	sortedset.AddOrUpdate(1000111, 101)
+	sortedset.AddOrUpdate(10001112, 99)
+	sortedset.AddOrUpdate(10001113, 99)
+	sortedset.AddOrUpdate(10001114, 70)
 
-	sortedset.AddOrUpdate(1000111, 99, "ntrnrt")
+	sortedset.AddOrUpdate(1000111, 99)
 
 	sortedset.Remove(22)
 
@@ -109,17 +109,17 @@ func TestCase2(t *testing.T) {
 	sortedset := New()
 
 	// fill in new node
-	sortedset.AddOrUpdate(12, 89, "Kelly")
-	sortedset.AddOrUpdate(22, 100, "Staley")
-	sortedset.AddOrUpdate(33, 100, "Jordon")
-	sortedset.AddOrUpdate(1000, -321, "Park")
-	sortedset.AddOrUpdate(1000111, 101, "Albert")
-	sortedset.AddOrUpdate(10001112, 99, "Lyman")
-	sortedset.AddOrUpdate(10001113, 99, "Singleton")
-	sortedset.AddOrUpdate(10001114, 70, "Audrey")
+	sortedset.AddOrUpdate(12, 89)
+	sortedset.AddOrUpdate(22, 100)
+	sortedset.AddOrUpdate(33, 100)
+	sortedset.AddOrUpdate(1000, -321)
+	sortedset.AddOrUpdate(1000111, 101)
+	sortedset.AddOrUpdate(10001112, 99)
+	sortedset.AddOrUpdate(10001113, 99)
+	sortedset.AddOrUpdate(10001114, 70)
 
 	// update an existing node
-	sortedset.AddOrUpdate(1000111, 99, "ntrnrt")
+	sortedset.AddOrUpdate(1000111, 99)
 
 	// remove node
 	sortedset.Remove(22)
