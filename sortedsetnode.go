@@ -26,12 +26,12 @@ package sortedset
 
 type SortedSetLevel struct {
 	forward *SortedSetNode
-	span    int64
+	span    int32
 }
 
 // Node in skip list
 type SortedSetNode struct {
-	key      string      // unique key of this node
+	key      int32       // unique key of this node
 	Value    interface{} // associated data
 	score    SCORE       // score to determine the order of this node in the set
 	backward *SortedSetNode
@@ -39,7 +39,7 @@ type SortedSetNode struct {
 }
 
 // Get the key of the node
-func (this *SortedSetNode) Key() string {
+func (this *SortedSetNode) Key() int32 {
 	return this.key
 }
 
