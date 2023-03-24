@@ -237,13 +237,14 @@ func (s *SortedSet) PopMax() *SortedSetNode {
 func (s *SortedSet) AddOrUpdate(key int32, score SCORE) bool {
 	var newNode *SortedSetNode = nil
 
-	found := s.dict[key]
-	if found != nil {
+	_, found := s.dict[key]
+	if found {
+		node := s.dict[key]
 		// score does not change, only update value
-		if found.score == score {
+		if node.score == score {
 			// found.Value = value
 		} else { // score changes, delete and re-insert
-			s.delete(found.score, found.key)
+			s.delete(node.score, node.key)
 			newNode = s.insertNode(score, key)
 		}
 	} else {
@@ -253,17 +254,18 @@ func (s *SortedSet) AddOrUpdate(key int32, score SCORE) bool {
 	if newNode != nil {
 		s.dict[key] = newNode
 	}
-	return found == nil
+	return found
 }
 
 // Delete element specified by key
 //
 // Time complexity of this method is : O(log(N))
 func (s *SortedSet) Remove(key int32) *SortedSetNode {
-	found := s.dict[key]
-	if found != nil {
-		s.delete(found.score, found.key)
-		return found
+	_, found := s.dict[key]
+	if found {
+		node := s.dict[key]
+		s.delete(node.score, node.key)
+		return node
 	}
 	return nil
 }
