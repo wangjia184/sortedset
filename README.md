@@ -4,9 +4,7 @@ A Redis-inspired sorted set backed by a skip list. Nodes are taken in order
 from low score to high score; ties are ordered by key. Access by key is via a
 hash index, so membership tests are O(1) and score/rank operations are O(log N).
 
-This is a generic port of `github.com/wangjia184/sortedset`: the key, score,
-and value types are type parameters instead of `string` / `int64` /
-`interface{}`.
+
 
 ## API
 
