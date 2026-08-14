@@ -61,6 +61,4 @@ All operations are O(log N), except `GetByKey`/`Has`/`Remove` lookups which
 are O(1). GetRangeByScore is O(log N) to locate the start, then O(m) for m
 returned nodes.
 
-## License
 
-MIT.
