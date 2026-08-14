@@ -1,10 +1,11 @@
 package sortedset
 
 import (
+	"sync"
 	"testing"
 )
 
-func checkOrder(t *testing.T, nodes []*SortedSetNode, expectedOrder []string) {
+func checkOrder(t *testing.T, nodes []*SortedSetNode[string, int64, string], expectedOrder []string) {
 	if len(expectedOrder) != len(nodes) {
 		t.Errorf("nodes does not contain %d elements", len(expectedOrder))
 	}
@@ -12,17 +13,16 @@ func checkOrder(t *testing.T, nodes []*SortedSetNode, expectedOrder []string) {
 		if nodes[i].Key() != expectedOrder[i] {
 			t.Errorf("nodes[%d] is %q, but the expected key is %q", i, nodes[i].Key(), expectedOrder[i])
 		}
-
 	}
 }
 
-func checkIterByRankRange(t *testing.T, sortedset *SortedSet, start int, end int, expectedOrder []string) {
+func checkIterByRankRange(t *testing.T, sortedset *SortedSet[string, int64, string], start int, end int, expectedOrder []string) {
 	var keys []string
 
 	// check nil callback should do nothing
-	sortedset.IterFuncByRankRange(start, end, nil)
+	sortedset.IterFuncRangeByRank(start, end, nil)
 
-	sortedset.IterFuncByRankRange(start, end, func(key string, _ interface{}) bool {
+	sortedset.IterFuncRangeByRank(start, end, func(key string, _ string) bool {
 		keys = append(keys, key)
 		return true
 	})
@@ -39,13 +39,11 @@ func checkIterByRankRange(t *testing.T, sortedset *SortedSet, start int, end int
 	if len(expectedOrder) < 1 {
 		return
 	}
-	// reset data
 	keys = []string{}
 	var i int
-	sortedset.IterFuncByRankRange(start, end, func(key string, _ interface{}) bool {
+	sortedset.IterFuncRangeByRank(start, end, func(key string, _ string) bool {
 		keys = append(keys, key)
 		i++
-		// return early
 		return i < len(expectedOrder)-1
 	})
 	if len(expectedOrder)-1 != len(keys) {
@@ -56,17 +54,16 @@ func checkIterByRankRange(t *testing.T, sortedset *SortedSet, start int, end int
 			t.Errorf("keys[%d] is %q, but the expected key is %q", i, keys[i], expectedOrder[i])
 		}
 	}
-
 }
 
-func checkRankRangeIterAndOrder(t *testing.T, sortedset *SortedSet, start int, end int, remove bool, expectedOrder []string) {
+func checkRankRangeIterAndOrder(t *testing.T, sortedset *SortedSet[string, int64, string], start int, end int, remove bool, expectedOrder []string) {
 	checkIterByRankRange(t, sortedset, start, end, expectedOrder)
-	nodes := sortedset.GetByRankRange(start, end, remove)
+	nodes := sortedset.GetRangeByRank(start, end, remove)
 	checkOrder(t, nodes, expectedOrder)
 }
 
 func TestCase1(t *testing.T) {
-	sortedset := New()
+	sortedset := New[string, int64, string]()
 
 	sortedset.AddOrUpdate("a", 89, "Kelly")
 	sortedset.AddOrUpdate("b", 100, "Staley")
@@ -99,15 +96,11 @@ func TestCase1(t *testing.T) {
 
 	// get all nodes since the last one to first one
 	checkRankRangeIterAndOrder(t, sortedset, -1, 1, false, []string{"c", "e", "a", "h", "d"})
-
 }
 
 func TestCase2(t *testing.T) {
+	sortedset := New[string, int64, string]()
 
-	// create a new set
-	sortedset := New()
-
-	// fill in new node
 	sortedset.AddOrUpdate("a", 89, "Kelly")
 	sortedset.AddOrUpdate("b", 100, "Staley")
 	sortedset.AddOrUpdate("c", 100, "Jordon")
@@ -117,23 +110,20 @@ func TestCase2(t *testing.T) {
 	sortedset.AddOrUpdate("g", 99, "Singleton")
 	sortedset.AddOrUpdate("h", 70, "Audrey")
 
-	// update an existing node
 	sortedset.AddOrUpdate("e", 99, "ntrnrt")
 
-	// remove node
 	sortedset.Remove("b")
 
-	nodes := sortedset.GetByScoreRange(-500, 500, nil)
+	nodes := sortedset.GetRangeByScore(-500, 500, nil)
 	checkOrder(t, nodes, []string{"d", "h", "a", "e", "f", "g", "c"})
 
-	nodes = sortedset.GetByScoreRange(500, -500, nil)
-	//t.Logf("%v", nodes)
+	nodes = sortedset.GetRangeByScore(500, -500, nil)
 	checkOrder(t, nodes, []string{"c", "g", "f", "e", "a", "h", "d"})
 
-	nodes = sortedset.GetByScoreRange(600, 500, nil)
+	nodes = sortedset.GetRangeByScore(600, 500, nil)
 	checkOrder(t, nodes, []string{})
 
-	nodes = sortedset.GetByScoreRange(500, 600, nil)
+	nodes = sortedset.GetRangeByScore(500, 600, nil)
 	checkOrder(t, nodes, []string{})
 
 	rank := sortedset.FindRank("f")
@@ -146,38 +136,38 @@ func TestCase2(t *testing.T) {
 		t.Error("FindRank() does not return expected value `1`")
 	}
 
-	nodes = sortedset.GetByScoreRange(99, 100, nil)
+	nodes = sortedset.GetRangeByScore(99, 100, nil)
 	checkOrder(t, nodes, []string{"e", "f", "g", "c"})
 
-	nodes = sortedset.GetByScoreRange(90, 50, nil)
+	nodes = sortedset.GetRangeByScore(90, 50, nil)
 	checkOrder(t, nodes, []string{"a", "h"})
 
-	nodes = sortedset.GetByScoreRange(99, 100, &GetByScoreRangeOptions{
+	nodes = sortedset.GetRangeByScore(99, 100, &GetRangeByScoreOptions{
 		ExcludeStart: true,
 	})
 	checkOrder(t, nodes, []string{"c"})
 
-	nodes = sortedset.GetByScoreRange(100, 99, &GetByScoreRangeOptions{
+	nodes = sortedset.GetRangeByScore(100, 99, &GetRangeByScoreOptions{
 		ExcludeStart: true,
 	})
 	checkOrder(t, nodes, []string{"g", "f", "e"})
 
-	nodes = sortedset.GetByScoreRange(99, 100, &GetByScoreRangeOptions{
+	nodes = sortedset.GetRangeByScore(99, 100, &GetRangeByScoreOptions{
 		ExcludeEnd: true,
 	})
 	checkOrder(t, nodes, []string{"e", "f", "g"})
 
-	nodes = sortedset.GetByScoreRange(100, 99, &GetByScoreRangeOptions{
+	nodes = sortedset.GetRangeByScore(100, 99, &GetRangeByScoreOptions{
 		ExcludeEnd: true,
 	})
 	checkOrder(t, nodes, []string{"c"})
 
-	nodes = sortedset.GetByScoreRange(50, 100, &GetByScoreRangeOptions{
+	nodes = sortedset.GetRangeByScore(50, 100, &GetRangeByScoreOptions{
 		Limit: 2,
 	})
 	checkOrder(t, nodes, []string{"h", "a"})
 
-	nodes = sortedset.GetByScoreRange(100, 50, &GetByScoreRangeOptions{
+	nodes = sortedset.GetRangeByScore(100, 50, &GetRangeByScoreOptions{
 		Limit: 2,
 	})
 	checkOrder(t, nodes, []string{"c", "g"})
@@ -192,7 +182,7 @@ func TestCase2(t *testing.T) {
 		t.Error("PopMin() does not return expected value `d`")
 	}
 
-	nodes = sortedset.GetByScoreRange(-500, 500, nil)
+	nodes = sortedset.GetRangeByScore(-500, 500, nil)
 	checkOrder(t, nodes, []string{"h", "a", "e", "f", "g", "c"})
 
 	maxNode := sortedset.PeekMax()
@@ -205,6 +195,80 @@ func TestCase2(t *testing.T) {
 		t.Error("PopMax() does not return expected value `c`")
 	}
 
-	nodes = sortedset.GetByScoreRange(500, -500, nil)
+	nodes = sortedset.GetRangeByScore(500, -500, nil)
 	checkOrder(t, nodes, []string{"g", "f", "e", "a", "h"})
+}
+
+func TestHas(t *testing.T) {
+	sortedset := New[string, int64, string]()
+	if sortedset.Has("a") {
+		t.Fatal("Has() true for an empty set")
+	}
+
+	sortedset.AddOrUpdate("a", 10, "v-a")
+	sortedset.AddOrUpdate("b", 20, "v-b")
+	if !sortedset.Has("a") || !sortedset.Has("b") {
+		t.Fatal("Has() false after AddOrUpdate")
+	}
+	if sortedset.Has("missing") {
+		t.Fatal("Has() true for an unknown key")
+	}
+
+	sortedset.Remove("a")
+	if sortedset.Has("a") {
+		t.Fatal("Has() still true after Remove")
+	}
+	if !sortedset.Has("b") {
+		t.Fatal("Has() false for the remaining key")
+	}
+}
+
+func TestConcurrentReaders(t *testing.T) {
+	sortedset := New[int64, int64, int64]()
+
+	var wg sync.WaitGroup
+	stop := make(chan struct{})
+
+	// writer mutates the set on one goroutine.
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		i := int64(0)
+		for {
+			select {
+			case <-stop:
+				return
+			default:
+			}
+			key := i % 1000
+			sortedset.AddOrUpdate(key, i, i)
+			if i%7 == 0 {
+				sortedset.Remove(key)
+			}
+			i++
+		}
+	}()
+
+	// concurrent readers query membership via Has (the only concurrency-safe
+	// method) without racing the writer.
+	for r := 0; r < 4; r++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for {
+				select {
+				case <-stop:
+					return
+				default:
+				}
+				_ = sortedset.Has(int64(r))
+			}
+		}()
+	}
+
+	for i := 0; i < 50; i++ {
+		_ = sortedset.Has(int64(i))
+	}
+	close(stop)
+	wg.Wait()
 }
